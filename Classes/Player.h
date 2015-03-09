@@ -22,12 +22,6 @@ public:
         }
     }
 
-    /*virtual bool init () override {
-        this->setTexture (std::string (PLAYER_IMG));
-
-        return true;
-    }*/
-
 private:
 
 };
