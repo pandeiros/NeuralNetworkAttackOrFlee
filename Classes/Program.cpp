@@ -33,13 +33,40 @@ bool Program::init()
     menu->setPosition(Vec2::ZERO);
     this->addChild(menu, 1);
 
-    /////////////////////////////
-    // 3. add your codes below...
+    // =====================================================================
 
-    // add a label shows "Hello World"
-    // create and initialize a label
+    // >>> GAME LAYER <<<
+    gameLayer = cocos2d::LayerColor::create (cocos2d::Color4B(10,103,163,150));
+    gameLayer->setPosition (visibleSize.width * 1 / 5.f, visibleSize.height * 2 / 5.f);
+    gameLayer->changeHeight (visibleSize.height * 3 / 5);
+    gameLayer->changeWidth (visibleSize.width * 4 / 5);
+    this->addChild (gameLayer);
+
+    // >>> NETWORK LAYER <<<
+    infoLayer = cocos2d::LayerColor::create (cocos2d::Color4B (255, 65, 0, 150));
+    infoLayer->setPosition (0, visibleSize.height * 2 / 5.f);
+    infoLayer->changeHeight (visibleSize.height * 3 / 5);
+    infoLayer->changeWidth (visibleSize.width * 1 / 5);
+    this->addChild (infoLayer);
+
+    // >>> GAME LAYER <<<
+    networkLayer = cocos2d::LayerColor::create (cocos2d::Color4B (255, 188, 0, 150));
+    networkLayer->setPosition (0,0);
+    networkLayer->changeHeight (visibleSize.height * 2 / 5);
+    this->addChild (networkLayer);
+
+    // >>> PLAYER <<<
+    player = Player::create ();
+    player->setPosition (50, gameLayer->getBoundingBox ().size.height / 2.f);
+    gameLayer->addChild (player, 15);
+
+    scheduleUpdate ();
     
     return true;
+}
+
+void Program::update (float dt) {
+
 }
 
 
