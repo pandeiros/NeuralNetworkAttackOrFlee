@@ -45,10 +45,16 @@ private:
     /// Parameters
     unsigned int iterations = 1;
     unsigned int spawnCount = 3;
+    unsigned int hp = 100;
+    unsigned int distance = 0;
+    unsigned int maxDistance = 500;
 
-    /// Labels
+    /// Parameter Labels
     cocos2d::Label * lblIterations;
+    cocos2d::Label * lblMaxDistance;
     cocos2d::Label * lblSpawns;
+    cocos2d::Label * lblDistance;
+    cocos2d::Label * lblHP;
 
     /// Other
     cocos2d::Size visibleSize;

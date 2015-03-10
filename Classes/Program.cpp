@@ -46,10 +46,13 @@ bool Program::init()
 }
 
 void Program::update (float dt) {
+    // Update labels
     lblIterations->setString (std::to_string (iterations));
+    lblDistance->setString (std::to_string (distance));
     lblSpawns->setString (std::to_string (spawnCount));
-
-    lblSpawns->setColor (Color3B (255, 255, (9 - spawnCount) * 255 / 8));
+    lblHP->setString (std::to_string (hp));
+    lblMaxDistance->setString (std::to_string (maxDistance));
+    lblSpawns->setColor (Color3B (255, (9 - spawnCount) * 255 / 8, (9 - spawnCount) * 255 / 8));
 }
 
 void Program::initLayers () {
@@ -96,18 +99,39 @@ void Program::initLabels () {
     lblIterations->setColor (Color3B (220, 220, 220));
     infoLayer->addChild (lblIterations, 10);
 
+    // >>> MAX DISTANCE <<<
+    lblMaxDistance = Label::createWithTTF (std::to_string (maxDistance), std::string (FONT_PATH), 60);
+    lblMaxDistance->setAnchorPoint (Vec2 (0, 0));
+    lblMaxDistance->setPosition (20, infoLayer->getBoundingBox ().size.height * 2 / 4 + 20);
+    lblMaxDistance->setColor (Color3B (220, 220, 220));
+    infoLayer->addChild (lblMaxDistance, 10);
+
+    // >>> DISTANCE <<<
+    lblDistance = Label::createWithTTF (std::to_string (distance), std::string (FONT_PATH), 60);
+    lblDistance->setAnchorPoint (Vec2 (0, 0));
+    lblDistance->setPosition (gameLayer->getBoundingBox ().size.width * 2 / 4 + 20, 20);
+    lblDistance->setColor (Color3B (220, 220, 220));
+    gameLayer->addChild (lblDistance, 10);
+
+    // >>> HP <<<
+    lblHP = Label::createWithTTF (std::to_string (hp), std::string (FONT_PATH), 60);
+    lblHP->setAnchorPoint (Vec2 (0, 0));
+    lblHP->setPosition (gameLayer->getBoundingBox ().size.width * 0 / 4 + 20, 20);
+    lblHP->setColor (Color3B (220, 220, 220));
+    gameLayer->addChild (lblHP, 10);
+
     // >>> SPAWNS <<<
     lblSpawns = Label::createWithTTF (std::to_string (spawnCount), std::string (FONT_PATH), 60);
     lblSpawns->setAnchorPoint (Vec2 (0, 0));
-    lblSpawns->setPosition (20, infoLayer->getBoundingBox ().size.height * 2 / 4 + 20);
-    lblSpawns->setColor (Color3B (255, 255, (9 - spawnCount) * 255 / 8));
-    infoLayer->addChild (lblSpawns, 10);
+    lblSpawns->setPosition (gameLayer->getBoundingBox ().size.width * 1 / 4 + 20, 20);
+    lblSpawns->setColor (Color3B (255, (9 - spawnCount) * 255 / 8, (9 - spawnCount) * 255 / 8));
+    gameLayer->addChild (lblSpawns, 10);
 }
 
 void Program::spawnEnemies () {
     auto vec = gameLayer->getChildren ();
     for (auto & e : vec) {
-        if (e != player)
+        if (e != player && e != lblDistance && e != lblHP && e != lblSpawns)
             e->removeFromParent ();
     }
 
@@ -115,9 +139,15 @@ void Program::spawnEnemies () {
 
     for (unsigned int i = 0; i < spawnCount; ++i) {
         Enemy * enemy = Enemy::create ();
-        enemy->setPosition (rand () % 700 + 150, gameLayer->getBoundingBox ().size.height / 2.f);
+        enemy->setPosition (rand () % maxDistance + 150, gameLayer->getBoundingBox ().size.height / 2.f);
         gameLayer->addChild (enemy, 10);
         vecEnemies.push_back (enemy);
+    }
+
+    // Update distance
+    distance = 9999;
+    for (auto & e : vecEnemies) {
+        distance = std::min (distance, (unsigned)e->getPosition ().x - (unsigned)player->getPosition ().x);
     }
 }
 
@@ -131,17 +161,31 @@ void Program::keyPressedEvent (cocos2d::EventKeyboard::KeyCode keyCode, cocos2d:
             break;
 
         // ++ITERATIONS
-        case Key::KEY_KP_PLUS :
-        case Key::KEY_PLUS :
+        case Key::KEY_UP_ARROW :
             iterations *= 10;
+            if (iterations > 1000)
+                iterations = 1000;
             break;
 
-        // ++ITERATIONS
-        case Key::KEY_KP_MINUS:
-        case Key::KEY_MINUS:
+        // --ITERATIONS
+        case Key::KEY_DOWN_ARROW:
             iterations /= 10;
             if (iterations == 0)
                 iterations = 1;
+            break;
+
+        // ++MAXDISTANCE
+        case Key::KEY_RIGHT_ARROW:
+            maxDistance += 100;
+            if (maxDistance > 2000)
+                maxDistance = 2000;
+            break;
+
+        // --MAXDISTANCE
+        case Key::KEY_LEFT_ARROW:
+            maxDistance -= 100;
+            if (maxDistance < 100)
+                maxDistance = 100;
             break;
 
         // SPAWN
