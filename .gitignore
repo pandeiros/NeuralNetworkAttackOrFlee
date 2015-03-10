@@ -6,6 +6,10 @@ cocos2d/*
 .cocos-project.json
 CMakeLists.txt
 
+#win32build files
+[Dd]ebug.win32/
+[Rr]elease.win32/
+
 # Custom excludes
 *.tlog
 *.exp
