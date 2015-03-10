@@ -65,6 +65,10 @@ private:
     cocos2d::Label * lblDistanceInfo;
     cocos2d::Label * lblHPInfo;
 
+    /// Control labels
+
+    /// Message labels
+
     /// Other
     cocos2d::Size visibleSize;
 };

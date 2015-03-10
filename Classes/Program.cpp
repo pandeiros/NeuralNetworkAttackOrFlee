@@ -179,6 +179,10 @@ void Program::spawnEnemies () {
         vecEnemies.push_back (enemy);
     }
 
+    // Sort
+    std::sort (vecEnemies.begin (), vecEnemies.end (), [] (Enemy * a, Enemy * b) {
+        return (a->getPosition ().x < b->getPosition ().x); });
+
     // Update distance
     distance = 9999;
     for (auto & e : vecEnemies) {
@@ -223,9 +227,25 @@ void Program::keyPressedEvent (cocos2d::EventKeyboard::KeyCode keyCode, cocos2d:
                 maxDistance = 100;
             break;
 
-        // SPAWN
-        case Key::KEY_SPACE :
+        // SPAWN / SHUFFLE
+        case Key::KEY_S :
             spawnEnemies ();
+            break;
+
+        // LEARN
+        case Key::KEY_SPACE :
+            // learn ();
+            break;
+
+        // ATTACK
+        case Key::KEY_ENTER :
+        case Key::KEY_RETURN :
+            // attack ();
+            break;
+
+        // FLEE
+        case Key::KEY_BACKSPACE :
+            // flee ();
             break;
     }
 
