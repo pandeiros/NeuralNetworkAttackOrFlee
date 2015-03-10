@@ -2,6 +2,7 @@
 #define __PROGRAM_H__
 
 #define FONT_PATH "fonts/neural.ttf"
+#define FONT_BORDER_PATH "fonts/neuralol.ttf"
 
 #include "cocos2d.h"
 #include "Player.h"
@@ -27,7 +28,8 @@ private:
     void initLayers ();
     void initPlayer ();
     void initKeyListener ();
-    void initLabels ();
+    void initParamLabels ();
+    void initInfoLabels ();
 
     /// Events
     void keyPressedEvent (cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event);
@@ -55,6 +57,13 @@ private:
     cocos2d::Label * lblSpawns;
     cocos2d::Label * lblDistance;
     cocos2d::Label * lblHP;
+
+    /// Info labels
+    cocos2d::Label * lblIterationsInfo;
+    cocos2d::Label * lblMaxDistanceInfo;
+    cocos2d::Label * lblSpawnsInfo;
+    cocos2d::Label * lblDistanceInfo;
+    cocos2d::Label * lblHPInfo;
 
     /// Other
     cocos2d::Size visibleSize;
