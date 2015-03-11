@@ -76,7 +76,7 @@ void Program::update (float dt) {
 void Program::draw (cocos2d::Renderer * renderer, const cocos2d::Mat4 & transform, uint32_t flags) {
     updateNetworkLayout ();
 
-    cocos2d::ccDrawSolidRect (Vec2 (270, 420), Vec2 (270 + player->currentReloading / player->reloadTime * (360-270), 435), Color4F (1, 1, 0, 1));
+    cocos2d::ccDrawSolidRect (Vec2 (270, 420), Vec2 (270 + player->currentReloading / player->reloadTime * (360 - 270), 435), Color4F (1, 1, 0, 1));
 }
 
 void Program::initLayers () {
@@ -235,6 +235,13 @@ void Program::initMsgLabels () {
     lblDefeats->setPosition (gameLayer->getBoundingBox ().size.width / 2.f + 10, gameLayer->getBoundingBox ().size.height - 20);
     lblDefeats->setColor (Color3B (255, 0, 0));
     gameLayer->addChild (lblDefeats, 10);
+
+    // >>> MESSAGE << <
+    lblPrediction = Label::createWithTTF ("", std::string (FONT_PATH), 50);
+    lblPrediction->setAnchorPoint (Vec2 (0.5, 0));
+    lblPrediction->setPosition (gameLayer->getBoundingBox ().size.width / 2.f, gameLayer->getBoundingBox ().size.height * 3 / 4.f);
+    lblPrediction->setColor (Color3B (255, 255, 0));
+    gameLayer->addChild (lblPrediction, 10);
 }
 
 void Program::initNetworkLayout () {
@@ -256,6 +263,8 @@ void Program::generateScene (bool isMulti) {
     for (unsigned int i = 0; i < tempMax; ++i) {
         Enemy * enemy = Enemy::create ();
         enemy->setPosition (rand () % maxDistance + 150, gameLayer->getBoundingBox ().size.height / 2.f);
+        if (enemy->getPositionX () - player->getPositionX () > 1000)
+            enemy->setPositionX (player->getPositionX () + 1000);
         gameLayer->addChild (enemy, 10);
         vecEnemies.push_back (enemy);
     }
@@ -319,7 +328,7 @@ void Program::keyPressedEvent (cocos2d::EventKeyboard::KeyCode keyCode, cocos2d:
 
             // ANIMATED SIMULATION (ONE)
         case Key::KEY_SPACE:
-            if (status != 0 || vecEnemies.size() == 0) {
+            if (status != 0 || vecEnemies.size () == 0) {
                 generateScene (false);
                 status = 0;
             }
@@ -330,7 +339,12 @@ void Program::keyPressedEvent (cocos2d::EventKeyboard::KeyCode keyCode, cocos2d:
         case Key::KEY_ENTER:
         case Key::KEY_RETURN:
         case Key::KEY_KP_ENTER:
-            simulateMany ();
+            simulateMany (true);
+            break;
+
+            // MULTIPLE ASSESMENT
+        case Key::KEY_Q:
+            simulateMany (false);
             break;
 
             // PREDICT
@@ -360,8 +374,8 @@ void Program::updateParam (bool increase) {
         case 1:
             if (increase) {
                 maxDistance += 100;
-                if (maxDistance > 2000)
-                    maxDistance = 2000;
+                if (maxDistance > 1000)
+                    maxDistance = 1000;
             }
             else {
                 maxDistance -= 100;
@@ -424,7 +438,7 @@ void Program::updateLabelColors () {
     }
 }
 
-void Program::simulateOne (float dt)  {
+void Program::simulateOne (float dt) {
     network.shouldIStayOrShouldIGo (hp, enemies, distance);
 
     // Reset Win/Loses
@@ -488,13 +502,13 @@ void Program::simulateOne (float dt)  {
     lblVictories->setString (std::to_string (victories));
 }
 
-void Program::simulateMany () {
+void Program::simulateMany (bool isLearning) {
     victories = defeats = 0;
     lblDefeats->setString (std::to_string (defeats));
     lblVictories->setString (std::to_string (victories));
 
     for (unsigned int i = 0; i < iterations; ++i) {
-        generateScene (true);        
+        generateScene (true);
 
         bool prediction = network.shouldIStayOrShouldIGo (hp, enemies, distance);
 
@@ -543,13 +557,29 @@ void Program::simulateMany () {
         }
 
         // Results
-        if (status == 1) {
-            ++victories;
-            network.learn (true);
+        if (isLearning) {
+            if (status == 1) {
+                ++victories;
+                network.learn (true);
+            }
+            else if (status == -1) {
+                ++defeats;
+                network.learn (false);
+            }
         }
-        else if (status == -1) {
-            ++defeats;
-            network.learn (false);
+        else {
+            if (status == 1) {
+                if (prediction)
+                    ++victories;
+                else
+                    ++defeats;
+            }
+            else if (status == -1) {
+                if (prediction)
+                    ++defeats;
+                else
+                    ++victories;
+            }
         }
 
         lblDefeats->setString (std::to_string (defeats));
@@ -558,6 +588,14 @@ void Program::simulateMany () {
 }
 
 void Program::predict () {
+    bool result = network.shouldIStayOrShouldIGo (hp, enemies, distance);
+
+    if (result) {
+        lblPrediction->setString ("Attack !!!");
+    }
+    else {
+        lblPrediction->setString ("Flee...");
+    }
 }
 
 void Program::menuCloseCallback (Ref* pSender) {

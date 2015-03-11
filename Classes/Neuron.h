@@ -89,7 +89,7 @@ public:
 	void setOutput (const float & out);
 
 	// Set learning parameters values.
-	void setParameters (const float alpha, const float beta, const float eta);
+	static void setParameters (const float alpha, const float beta, const float eta);
 
 
 protected:

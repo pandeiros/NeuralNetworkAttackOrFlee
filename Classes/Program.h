@@ -52,7 +52,7 @@ private:
 
     /// Simulation
     void simulateOne (float dt);
-    void simulateMany ();
+    void simulateMany (bool isLearning);
     void predict ();
     bool activeSimulationOne = false;
     unsigned int targetIndex = 0;
@@ -105,6 +105,7 @@ private:
     /// Message labels
     cocos2d::Label * lblVictories;
     cocos2d::Label * lblDefeats;
+    cocos2d::Label * lblPrediction;
 
     /// Other
     cocos2d::Size visibleSize;

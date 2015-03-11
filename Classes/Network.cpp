@@ -1,9 +1,10 @@
 #include"Network.h"
 
 Network::Network () {
-	layers.push_back (new Layer (3, 0));
+	layers.push_back (new Layer (3, 1));
 	layers.push_back (new Layer (5, 3));
 	layers.push_back (new Layer (1, 5));
+    Neuron::setParameters (0.1, 1.5, 0.05);
 }
 
 Network::~Network() {
@@ -11,9 +12,9 @@ Network::~Network() {
 
 bool Network::shouldIStayOrShouldIGo (int hp, int enemies, int distance) {
 	float hapek, enem, dist;
-	hapek = hp/ 100;
-	enem = enemies / 10;
-	dist = distance / 1000;
+	hapek = hp / 100.f;
+	enem = enemies / 10.f;
+	dist = distance / 1000.f;
 
 	layers [0]->setOutput (hapek,enem,dist);
 
@@ -36,9 +37,9 @@ void Network::learn (bool attackOrNotToAttack) {
 
 	// PART 1 - INSTRUCTOR AND ERROR PROPAGATION
 	if (attackOrNotToAttack)
-		layers [layers.size () - 1]->outputLayerError (1.0f);
+		layers [layers.size () - 1]->outputLayerError (2.0f);
 	else
-		layers [layers.size () - 1]->outputLayerError (-1.0f);
+		layers [layers.size () - 1]->outputLayerError (-2.0f);
 
 	for (unsigned int i = layers.size () - 2; i >= 1; --i) {
 		layers [i]->calculateErrors (*layers [i + 1]);
