@@ -22,7 +22,7 @@ public:
         }
     }
 
-    float reloadTime = 1.f;
+    float reloadTime = 0.5f;
     float currentReloading = 0.f;
 };
 

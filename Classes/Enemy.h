@@ -22,7 +22,7 @@ public:
         }
     }
 
-    float speedPerSecond = 200;
+    float speedPerSecond = 300;
     unsigned int maxDMG = 50;
     unsigned int minDMG = 30;
 };

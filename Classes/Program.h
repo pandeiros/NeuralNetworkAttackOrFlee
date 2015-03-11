@@ -30,6 +30,7 @@ private:
     void initKeyListener ();
     void initParamLabels ();
     void initInfoLabels ();
+    void initMsgLabels ();
 
     /// Events
     void keyPressedEvent (cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event);
@@ -44,6 +45,9 @@ private:
     bool activeSimulationOne = false;
     unsigned int targetIndex = 0;
     int status = 0; // 0 - unresolved, 1 - victory, -1 - defeat.
+    unsigned int victories = 0;
+    unsigned int defeats = 0;
+    float step = 0.1;
 
     /// Layers
     cocos2d::LayerColor * gameLayer;
@@ -89,6 +93,8 @@ private:
     /// Control labels
 
     /// Message labels
+    cocos2d::Label * lblVictories;
+    cocos2d::Label * lblDefeats;
 
     /// Other
     cocos2d::Size visibleSize;

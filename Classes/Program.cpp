@@ -3,35 +3,33 @@
 USING_NS_CC;
 
 // on "init" you need to initialize your instance
-bool Program::init()
-{
+bool Program::init () {
     //////////////////////////////
     // 1. super init first
-    if ( !Scene::init() )
-    {
+    if (!Scene::init ()) {
         return false;
     }
 
-    visibleSize = Director::getInstance()->getVisibleSize();
-    Vec2 origin = Director::getInstance()->getVisibleOrigin();
+    visibleSize = Director::getInstance ()->getVisibleSize ();
+    Vec2 origin = Director::getInstance ()->getVisibleOrigin ();
 
     /////////////////////////////
     // 2. add a menu item with "X" image, which is clicked to quit the program
     //    you may modify it.
 
     // add a "close" icon to exit the progress. it's an autorelease object
-    auto closeItem = MenuItemImage::create(
+    auto closeItem = MenuItemImage::create (
                                            "CloseNormal.png",
                                            "CloseSelected.png",
-                                           CC_CALLBACK_1(Program::menuCloseCallback, this));
+                                           CC_CALLBACK_1 (Program::menuCloseCallback, this));
 
-	closeItem->setPosition(Vec2(origin.x + visibleSize.width - closeItem->getContentSize().width/2 ,
-                                origin.y + closeItem->getContentSize().height/2));
+    closeItem->setPosition (Vec2 (origin.x + visibleSize.width - closeItem->getContentSize ().width / 2,
+                                origin.y + closeItem->getContentSize ().height / 2));
 
     // create menu, it's an autorelease object
-    auto menu = Menu::create(closeItem, NULL);
-    menu->setPosition(Vec2::ZERO);
-    this->addChild(menu, 1);
+    auto menu = Menu::create (closeItem, NULL);
+    menu->setPosition (Vec2::ZERO);
+    this->addChild (menu, 1);
 
     // =====================================================================
 
@@ -40,6 +38,7 @@ bool Program::init()
     initKeyListener ();
     initParamLabels ();
     initInfoLabels ();
+    initMsgLabels ();
     updateLabelColors ();
 
     scheduleUpdate ();
@@ -48,12 +47,12 @@ bool Program::init()
 }
 
 void Program::update (float dt) {
-    if (activeSimulationOne && status == 0 && vecEnemies.size() > 0)
+    if (activeSimulationOne && status == 0 && vecEnemies.size () > 0)
         simulateOne (dt);
     else {
         // Update messages.
 
-        activeSimulationOne = false; 
+        activeSimulationOne = false;
     }
 
     // Update labels
@@ -211,9 +210,25 @@ void Program::initInfoLabels () {
     gameLayer->addChild (lblDistanceInfo, 10);
 }
 
+void Program::initMsgLabels () {
+    // >>> VICTORIES << <
+    lblVictories = Label::createWithTTF (std::to_string (victories), std::string (FONT_PATH), 50);
+    lblVictories->setAnchorPoint (Vec2 (1, 1));
+    lblVictories->setPosition (gameLayer->getBoundingBox ().size.width / 2.f - 10, gameLayer->getBoundingBox ().size.height - 20);
+    lblVictories->setColor (Color3B (0, 255, 0));
+    gameLayer->addChild (lblVictories, 10);
+
+    // >>> DEFEATS << <
+    lblDefeats = Label::createWithTTF (std::to_string (defeats), std::string (FONT_PATH), 50);
+    lblDefeats->setAnchorPoint (Vec2 (0, 1));
+    lblDefeats->setPosition (gameLayer->getBoundingBox ().size.width / 2.f + 10, gameLayer->getBoundingBox ().size.height - 20);
+    lblDefeats->setColor (Color3B (255, 0, 0));
+    gameLayer->addChild (lblDefeats, 10);
+}
+
 void Program::generateScene () {
     for (auto & e : vecEnemies) {
-        if (e && e->getParent())
+        if (e && e->getParent ())
             e->removeFromParent ();
     }
 
@@ -239,6 +254,8 @@ void Program::generateScene () {
     for (auto & e : vecEnemies) {
         distance = std::min (distance, (unsigned)e->getPosition ().x - (unsigned)player->getPosition ().x);
     }
+
+    status = 0;
 }
 
 void Program::keyPressedEvent (cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event) {
@@ -250,35 +267,35 @@ void Program::keyPressedEvent (cocos2d::EventKeyboard::KeyCode keyCode, cocos2d:
             Director::getInstance ()->end ();
             break;
 
-        // PARAM CHOICE UP
-        case Key::KEY_UP_ARROW :
-            activeParam == 0 ? activeParam = 3 : activeParam = (activeParam - 1) % 4;            
+            // PARAM CHOICE UP
+        case Key::KEY_UP_ARROW:
+            activeParam == 0 ? activeParam = 3 : activeParam = (activeParam - 1) % 4;
             updateLabelColors ();
             break;
 
-        // PARAM CHOICE DOWN
+            // PARAM CHOICE DOWN
         case Key::KEY_DOWN_ARROW:
             activeParam = (activeParam + 1) % 4;
             updateLabelColors ();
             break;
 
-        // INCREASE PARAM
+            // INCREASE PARAM
         case Key::KEY_RIGHT_ARROW:
             updateParam (true);
             break;
 
-        // DECREASE PARAM
+            // DECREASE PARAM
         case Key::KEY_LEFT_ARROW:
             updateParam (false);
             break;
 
-        // SPAWN / SHUFFLE
-        case Key::KEY_S :
+            // SPAWN / SHUFFLE
+        case Key::KEY_S:
             generateScene ();
             break;
 
-        // ANIMATED SIMULATION (ONE)
-        case Key::KEY_SPACE :
+            // ANIMATED SIMULATION (ONE)
+        case Key::KEY_SPACE:
             if (status != 0) {
                 generateScene ();
                 status = 0;
@@ -286,23 +303,19 @@ void Program::keyPressedEvent (cocos2d::EventKeyboard::KeyCode keyCode, cocos2d:
             activeSimulationOne = true;
             break;
 
-        // MULTIPLE FAST SIMULATIONS
-        case Key::KEY_ENTER :
-        case Key::KEY_RETURN :
+            // MULTIPLE FAST SIMULATIONS
+        case Key::KEY_ENTER:
+        case Key::KEY_RETURN:
+        case Key::KEY_KP_ENTER:
             simulateMany ();
             break;
 
-        // PREDICT
-        case Key::KEY_BACKSPACE :
+            // PREDICT
+        case Key::KEY_BACKSPACE:
             predict ();
             break;
     }
-
-    // NUMBER OF SPAWNS
-    /*if (keyCode >= Key::KEY_1 && keyCode <= Key::KEY_9) {
-        maxEnemies = (unsigned int)(keyCode) - 76;
-    }*/
-}   
+}
 
 void Program::updateParam (bool increase) {
     switch (activeParam) {
@@ -333,7 +346,7 @@ void Program::updateParam (bool increase) {
                     maxDistance = 100;
             }
             break;
-            
+
             // MIN HP
         case 2:
             if (increase) {
@@ -388,7 +401,12 @@ void Program::updateLabelColors () {
     }
 }
 
-void Program::simulateOne (float dt) {
+void Program::simulateOne (float dt)  {
+    // Reset Win/Loses
+    victories = defeats = 0;
+    lblDefeats->setString (std::to_string (defeats));
+    lblVictories->setString (std::to_string (victories));
+
     // Reload
     player->currentReloading += dt;
 
@@ -409,10 +427,10 @@ void Program::simulateOne (float dt) {
             e->setPositionX (e->getPositionX () - e->speedPerSecond * dt);
 
             // Attack player if in range
-            if (e->getPositionX () <= player->getPositionX () + player->getBoundingBox().size.width) {
+            if (e->getPositionX () <= player->getPositionX () + player->getBoundingBox ().size.width) {
                 unsigned int tempDMG = e->minDMG + rand () % (e->maxDMG - e->minDMG + 1);
                 tempDMG > hp ? hp = 0 : hp -= tempDMG;
-               
+
                 e->removeFromParent ();
                 e = nullptr;
                 ++targetIndex;
@@ -429,26 +447,93 @@ void Program::simulateOne (float dt) {
     }
 
     // VICTORY
-    if (enemies == 0)
+    if (enemies == 0 && hp > 0)
         status = 1;
+
+    if (status == 1)
+        ++victories;
+    else if (status == -1)
+        ++defeats;
+
+    lblDefeats->setString (std::to_string (defeats));
+    lblVictories->setString (std::to_string (victories));
 }
 
 void Program::simulateMany () {
+    victories = defeats = 0;
+    lblDefeats->setString (std::to_string (defeats));
+    lblVictories->setString (std::to_string (victories));
+
+    for (unsigned int i = 0; i < iterations; ++i) {
+        generateScene ();        
+
+        while (status == 0) {
+            player->currentReloading += step;
+
+            // Shoot
+            if (player->currentReloading >= player->reloadTime) {
+                player->currentReloading -= player->reloadTime;
+
+                // Kill first enemy
+                vecEnemies[targetIndex]->removeFromParent ();
+                vecEnemies[targetIndex] = nullptr;
+                ++targetIndex;
+                --enemies;
+            }
+
+            // Move enemies
+            for (auto & e : vecEnemies) {
+                if (e) {
+                    e->setPositionX (e->getPositionX () - e->speedPerSecond * step);
+
+                    // Attack player if in range
+                    if (e->getPositionX () <= player->getPositionX () + player->getBoundingBox ().size.width) {
+                        unsigned int tempDMG = e->minDMG + rand () % (e->maxDMG - e->minDMG + 1);
+                        tempDMG > hp ? hp = 0 : hp -= tempDMG;
+
+                        e->removeFromParent ();
+                        e = nullptr;
+                        ++targetIndex;
+                        --enemies;
+
+                        // Check player's hp
+                        if (hp <= 0) {
+
+                            // DEFEAT
+                            status = -1;
+                        }
+                    }
+                }
+            }
+
+            // VICTORY
+            if (enemies == 0 && hp > 0)
+                status = 1;
+        }
+
+        // Results
+        if (status == 1)
+            ++victories;
+        else if (status == -1)
+            ++defeats;
+
+        lblDefeats->setString (std::to_string (defeats));
+        lblVictories->setString (std::to_string (victories));
+    }
 }
 
 void Program::predict () {
 }
 
-void Program::menuCloseCallback(Ref* pSender)
-{
+void Program::menuCloseCallback (Ref* pSender) {
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_WP8) || (CC_TARGET_PLATFORM == CC_PLATFORM_WINRT)
-	MessageBox("You pressed the close button. Windows Store Apps do not implement a close button.","Alert");
+    MessageBox ("You pressed the close button. Windows Store Apps do not implement a close button.", "Alert");
     return;
 #endif
 
-    Director::getInstance()->end();
+    Director::getInstance ()->end ();
 
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
-    exit(0);
+    exit (0);
 #endif
 }
