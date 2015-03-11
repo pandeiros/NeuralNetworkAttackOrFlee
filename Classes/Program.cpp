@@ -40,6 +40,7 @@ bool Program::init()
     initKeyListener ();
     initParamLabels ();
     initInfoLabels ();
+    updateLabelColors ();
 
     scheduleUpdate ();
 
@@ -49,11 +50,15 @@ bool Program::init()
 void Program::update (float dt) {
     // Update labels
     lblIterations->setString (std::to_string (iterations));
-    lblDistance->setString (std::to_string (distance));
-    lblSpawns->setString (std::to_string (spawnCount));
-    lblHP->setString (std::to_string (hp));
     lblMaxDistance->setString (std::to_string (maxDistance));
-    lblSpawns->setColor (Color3B (255, (9 - spawnCount) * 255 / 8, (9 - spawnCount) * 255 / 8));
+    lblMaxEnemies->setString (std::to_string (maxEnemies));
+    lblMinHp->setString (std::to_string (minHp));
+
+    lblHP->setString (std::to_string (hp));
+    lblDistance->setString (std::to_string (distance));
+    lblEnemies->setString (std::to_string (enemies));
+
+    lblMaxEnemies->setColor (Color3B (255, (10 - maxEnemies) * 255 / 9, (10 - maxEnemies) * 255 / 9));
 }
 
 void Program::initLayers () {
@@ -107,42 +112,74 @@ void Program::initParamLabels () {
     lblMaxDistance->setColor (Color3B (255, 255, 255));
     infoLayer->addChild (lblMaxDistance, 10);
 
-    // >>> DISTANCE <<<
-    lblDistance = Label::createWithTTF (std::to_string (distance), std::string (FONT_PATH), 60);
-    lblDistance->setAnchorPoint (Vec2 (0, 0));
-    lblDistance->setPosition (gameLayer->getBoundingBox ().size.width * 2 / 3 + 20, 20);
-    lblDistance->setColor (Color3B (225, 225, 225));
-    gameLayer->addChild (lblDistance, 10);
+    // >>> MIN HP <<<
+    lblMinHp = Label::createWithTTF (std::to_string (minHp), std::string (FONT_PATH), 60);
+    lblMinHp->setAnchorPoint (Vec2 (0, 0));
+    lblMinHp->setPosition (25, infoLayer->getBoundingBox ().size.height * 1 / 4 + 5);
+    lblMinHp->setColor (Color3B (255, 255, 255));
+    infoLayer->addChild (lblMinHp, 10);
+
+    // >>> MAX ENEMIES <<<
+    lblMaxEnemies = Label::createWithTTF (std::to_string (maxEnemies), std::string (FONT_PATH), 60);
+    lblMaxEnemies->setAnchorPoint (Vec2 (0, 0));
+    lblMaxEnemies->setPosition (25, infoLayer->getBoundingBox ().size.height * 0 / 4 + 5);
+    lblMaxEnemies->setColor (Color3B (255, (10 - maxEnemies) * 255 / 9, (10 - maxEnemies) * 255 / 9));
+    infoLayer->addChild (lblMaxEnemies, 10);
+
+    // =====================================================================
 
     // >>> HP <<<
     lblHP = Label::createWithTTF (std::to_string (hp), std::string (FONT_PATH), 60);
     lblHP->setAnchorPoint (Vec2 (0, 0));
-    lblHP->setPosition (gameLayer->getBoundingBox ().size.width * 0 / 4 + 20, 20);
+    lblHP->setPosition (gameLayer->getBoundingBox ().size.width * 0 / 3 + 20, 20);
     lblHP->setColor (Color3B (225, 225, 225));
     gameLayer->addChild (lblHP, 10);
 
-    // >>> SPAWNS <<<
-    lblSpawns = Label::createWithTTF (std::to_string (spawnCount), std::string (FONT_PATH), 60);
-    lblSpawns->setAnchorPoint (Vec2 (0, 0));
-    lblSpawns->setPosition (gameLayer->getBoundingBox ().size.width * 1 / 3 + 20, 20);
-    lblSpawns->setColor (Color3B (255, (9 - spawnCount) * 255 / 8, (9 - spawnCount) * 255 / 8));
-    gameLayer->addChild (lblSpawns, 10);
+    // >>> ENEMIES <<<
+    lblEnemies = Label::createWithTTF (std::to_string (enemies), std::string (FONT_PATH), 60);
+    lblEnemies->setAnchorPoint (Vec2 (0, 0));
+    lblEnemies->setPosition (gameLayer->getBoundingBox ().size.width * 2 / 5, 20);
+    lblEnemies->setColor (Color3B (225, 225, 225));
+    gameLayer->addChild (lblEnemies, 10);
+
+    // >>> DISTANCE <<<
+    lblDistance = Label::createWithTTF (std::to_string (distance), std::string (FONT_PATH), 60);
+    lblDistance->setAnchorPoint (Vec2 (0, 0));
+    lblDistance->setPosition (gameLayer->getBoundingBox ().size.width * 4 / 5 + 20, 20);
+    lblDistance->setColor (Color3B (225, 225, 225));
+    gameLayer->addChild (lblDistance, 10);
 }
 
 void Program::initInfoLabels () {
     // >>> ITERATIONS INFO <<<
-    lblIterationsInfo = Label::createWithTTF ("Iterations [Up/Down]", std::string (FONT_PATH), 30);
+    lblIterationsInfo = Label::createWithTTF ("Iterations", std::string (FONT_PATH), 30);
     lblIterationsInfo->setAnchorPoint (Vec2 (0, 0));
     lblIterationsInfo->setPosition (10, infoLayer->getBoundingBox ().size.height * 3 / 4 + 65);
     lblIterationsInfo->setColor (Color3B (200, 200, 200));
     infoLayer->addChild (lblIterationsInfo, 10);
 
     // >>> MAX DISTANCE INFO <<<
-    lblMaxDistanceInfo = Label::createWithTTF ("Max dist. [Left/Right]", std::string (FONT_PATH), 30);
+    lblMaxDistanceInfo = Label::createWithTTF ("Max Distance", std::string (FONT_PATH), 30);
     lblMaxDistanceInfo->setAnchorPoint (Vec2 (0, 0));
     lblMaxDistanceInfo->setPosition (10, infoLayer->getBoundingBox ().size.height * 2 / 4 + 65);
     lblMaxDistanceInfo->setColor (Color3B (200, 200, 200));
     infoLayer->addChild (lblMaxDistanceInfo, 10);
+
+    // >>> MIN HP INFO <<<
+    lblMinHpInfo = Label::createWithTTF ("Min Hp", std::string (FONT_PATH), 30);
+    lblMinHpInfo->setAnchorPoint (Vec2 (0, 0));
+    lblMinHpInfo->setPosition (10, infoLayer->getBoundingBox ().size.height * 1 / 4 + 65);
+    lblMinHpInfo->setColor (Color3B (200, 200, 200));
+    infoLayer->addChild (lblMinHpInfo, 10);
+
+    // >>> MAX ENEMIES INFO <<<
+    lblMaxEnemiesinfo = Label::createWithTTF ("Enemies", std::string (FONT_PATH), 30);
+    lblMaxEnemiesinfo->setAnchorPoint (Vec2 (0, 0));
+    lblMaxEnemiesinfo->setPosition (10, infoLayer->getBoundingBox ().size.height * 0 / 4 + 65);
+    lblMaxEnemiesinfo->setColor (Color3B (200, 200, 200));
+    infoLayer->addChild (lblMaxEnemiesinfo, 10);
+
+    // ===================================================================
 
     // >>> HP INFO <<<
     lblHPInfo = Label::createWithTTF ("HP", std::string (FONT_PATH), 30);
@@ -151,33 +188,36 @@ void Program::initInfoLabels () {
     lblHPInfo->setColor (Color3B (200, 200, 200));
     gameLayer->addChild (lblHPInfo, 10);
 
-    // >>> SPAWNS INFO <<<
-    lblSpawnsInfo = Label::createWithTTF ("Enemies", std::string (FONT_PATH), 30);
-    lblSpawnsInfo->setAnchorPoint (Vec2 (0, 0));
-    lblSpawnsInfo->setPosition (gameLayer->getBoundingBox ().size.width * 1 / 3 + 10, 80);
-    lblSpawnsInfo->setColor (Color3B (200, 200, 200));
-    gameLayer->addChild (lblSpawnsInfo, 10);
+    // >>> ENEMIES INFO <<<
+    lblEnemiesInfo = Label::createWithTTF ("Remaining Enemies", std::string (FONT_PATH), 30);
+    lblEnemiesInfo->setAnchorPoint (Vec2 (0, 0));
+    lblEnemiesInfo->setPosition (gameLayer->getBoundingBox ().size.width * 2 / 5 - 10, 80);
+    lblEnemiesInfo->setColor (Color3B (200, 200, 200));
+    gameLayer->addChild (lblEnemiesInfo, 10);
 
     // >>> DISTANCE INFO <<<
     lblDistanceInfo = Label::createWithTTF ("Distance", std::string (FONT_PATH), 30);
     lblDistanceInfo->setAnchorPoint (Vec2 (0, 0));
-    lblDistanceInfo->setPosition (gameLayer->getBoundingBox ().size.width * 2 / 3 + 10, 80);
+    lblDistanceInfo->setPosition (gameLayer->getBoundingBox ().size.width * 4 / 5 + 10, 80);
     lblDistanceInfo->setColor (Color3B (200, 200, 200));
     gameLayer->addChild (lblDistanceInfo, 10);
 }
 
-void Program::spawnEnemies () {
+void Program::generateScene () {
     for (auto & e : vecEnemies) {
         e->removeFromParent ();
     }
     vecEnemies.clear ();
 
-    for (unsigned int i = 0; i < spawnCount; ++i) {
+    for (unsigned int i = 0; i < maxEnemies; ++i) {
         Enemy * enemy = Enemy::create ();
         enemy->setPosition (rand () % maxDistance + 150, gameLayer->getBoundingBox ().size.height / 2.f);
         gameLayer->addChild (enemy, 10);
         vecEnemies.push_back (enemy);
     }
+    enemies = maxEnemies;
+
+    minHp == 100 ? hp = 100 : hp = minHp + (rand () % (100 - minHp) + 1);
 
     // Sort
     std::sort (vecEnemies.begin (), vecEnemies.end (), [] (Enemy * a, Enemy * b) {
@@ -199,60 +239,147 @@ void Program::keyPressedEvent (cocos2d::EventKeyboard::KeyCode keyCode, cocos2d:
             Director::getInstance ()->end ();
             break;
 
-        // ++ITERATIONS
+        // PARAM CHOICE UP
         case Key::KEY_UP_ARROW :
-            iterations *= 10;
-            if (iterations > 1000)
-                iterations = 1000;
+            activeParam == 0 ? activeParam = 3 : activeParam = (activeParam - 1) % 4;            
+            updateLabelColors ();
             break;
 
-        // --ITERATIONS
+        // PARAM CHOICE DOWN
         case Key::KEY_DOWN_ARROW:
-            iterations /= 10;
-            if (iterations == 0)
-                iterations = 1;
+            activeParam = (activeParam + 1) % 4;
+            updateLabelColors ();
             break;
 
-        // ++MAXDISTANCE
+        // INCREASE PARAM
         case Key::KEY_RIGHT_ARROW:
-            maxDistance += 100;
-            if (maxDistance > 2000)
-                maxDistance = 2000;
+            updateParam (true);
             break;
 
-        // --MAXDISTANCE
+        // DECREASE PARAM
         case Key::KEY_LEFT_ARROW:
-            maxDistance -= 100;
-            if (maxDistance < 100)
-                maxDistance = 100;
+            updateParam (false);
             break;
 
         // SPAWN / SHUFFLE
         case Key::KEY_S :
-            spawnEnemies ();
+            generateScene ();
             break;
 
-        // LEARN
+        // ANIMATED SIMULATION (ONE)
         case Key::KEY_SPACE :
-            // learn ();
+            simulateOne ();
             break;
 
-        // ATTACK
+        // MULTIPLE FAST SIMULATIONS
         case Key::KEY_ENTER :
         case Key::KEY_RETURN :
-            // attack ();
+            simulateMany ();
             break;
 
-        // FLEE
+        // PREDICT
         case Key::KEY_BACKSPACE :
-            // flee ();
+            predict ();
             break;
     }
 
     // NUMBER OF SPAWNS
-    if (keyCode >= Key::KEY_1 && keyCode <= Key::KEY_9) {
-        spawnCount = (unsigned int)(keyCode) - 76;
+    /*if (keyCode >= Key::KEY_1 && keyCode <= Key::KEY_9) {
+        maxEnemies = (unsigned int)(keyCode) - 76;
+    }*/
+}   
+
+void Program::updateParam (bool increase) {
+    switch (activeParam) {
+        // ITERATIONS
+        case 0:
+            if (increase) {
+                iterations *= 10;
+                if (iterations > 1000)
+                    iterations = 1000;
+            }
+            else {
+                iterations /= 10;
+                if (iterations == 0)
+                    iterations = 1;
+            }
+            break;
+
+            // MAX DISTANCE
+        case 1:
+            if (increase) {
+                maxDistance += 100;
+                if (maxDistance > 2000)
+                    maxDistance = 2000;
+            }
+            else {
+                maxDistance -= 100;
+                if (maxDistance < 100)
+                    maxDistance = 100;
+            }
+            break;
+            
+            // MIN HP
+        case 2:
+            if (increase) {
+                minHp += 10;
+                if (minHp > 100)
+                    minHp = 100;
+            }
+            else {
+                minHp -= 10;
+                if (minHp == 0)
+                    minHp = 10;
+            }
+            break;
+
+            // MAX ENEMIES
+        case 3:
+            if (increase) {
+                maxEnemies += 1;
+                if (maxEnemies > 10)
+                    maxEnemies = 10;
+            }
+            else {
+                maxEnemies -= 1;
+                if (maxEnemies == 0)
+                    maxEnemies = 1;
+            }
+            break;
+
+        default: break;
     }
+}
+
+void Program::updateLabelColors () {
+    lblIterationsInfo->setColor (cocos2d::Color3B (200, 200, 200));
+    lblMaxDistanceInfo->setColor (cocos2d::Color3B (200, 200, 200));
+    lblMinHpInfo->setColor (cocos2d::Color3B (200, 200, 200));
+    lblMaxEnemiesinfo->setColor (cocos2d::Color3B (200, 200, 200));
+
+    switch (activeParam) {
+        case 0:
+            lblIterationsInfo->setColor (cocos2d::Color3B (225, 225, 0));
+            break;
+        case 1:
+            lblMaxDistanceInfo->setColor (cocos2d::Color3B (225, 225, 0));
+            break;
+        case 2:
+            lblMinHpInfo->setColor (cocos2d::Color3B (225, 225, 0));
+            break;
+        case 3:
+            lblMaxEnemiesinfo->setColor (cocos2d::Color3B (225, 225, 0));
+            break;
+    }
+}
+
+void Program::simulateOne () {
+}
+
+void Program::simulateMany () {
+}
+
+void Program::predict () {
 }
 
 void Program::menuCloseCallback(Ref* pSender)

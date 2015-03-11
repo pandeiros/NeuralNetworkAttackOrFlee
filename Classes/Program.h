@@ -33,7 +33,14 @@ private:
 
     /// Events
     void keyPressedEvent (cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event);
-    void spawnEnemies ();
+    void generateScene ();
+    void updateParam (bool increase);
+    void updateLabelColors ();
+
+    /// Simulation
+    void simulateOne ();
+    void simulateMany ();
+    void predict ();
 
     /// Layers
     cocos2d::LayerColor * gameLayer;
@@ -46,24 +53,35 @@ private:
 
     /// Parameters
     unsigned int iterations = 1;
-    unsigned int spawnCount = 3;
+    unsigned int minHp = 100;
+    unsigned int maxDistance = 500;
+    unsigned int maxEnemies = 3;
+
+    /// Game status
     unsigned int hp = 100;
     unsigned int distance = 0;
-    unsigned int maxDistance = 500;
-
+    unsigned int enemies = 3;
+   
     /// Parameter Labels
     cocos2d::Label * lblIterations;
     cocos2d::Label * lblMaxDistance;
-    cocos2d::Label * lblSpawns;
+    cocos2d::Label * lblMinHp;
+    cocos2d::Label * lblMaxEnemies;
+    cocos2d::Label * lblEnemies;
     cocos2d::Label * lblDistance;
     cocos2d::Label * lblHP;
 
     /// Info labels
     cocos2d::Label * lblIterationsInfo;
     cocos2d::Label * lblMaxDistanceInfo;
-    cocos2d::Label * lblSpawnsInfo;
+    cocos2d::Label * lblMinHpInfo;
+    cocos2d::Label * lblMaxEnemiesinfo;
+    cocos2d::Label * lblEnemiesInfo;
     cocos2d::Label * lblDistanceInfo;
     cocos2d::Label * lblHPInfo;
+
+    /// Changing parameters control
+    int activeParam = 0;
 
     /// Control labels
 
