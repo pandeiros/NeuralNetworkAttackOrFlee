@@ -41,6 +41,9 @@ bool Program::init () {
     initMsgLabels ();
     updateLabelColors ();
 
+    initNetworkLayout ();
+    updateNetworkLayout ();
+
     scheduleUpdate ();
 
     return true;
@@ -66,6 +69,14 @@ void Program::update (float dt) {
     lblEnemies->setString (std::to_string (enemies));
 
     lblMaxEnemies->setColor (Color3B (255, (10 - maxEnemies) * 255 / 9, (10 - maxEnemies) * 255 / 9));
+
+    //updateNetworkLayout ();
+}
+
+void Program::draw (cocos2d::Renderer * renderer, const cocos2d::Mat4 & transform, uint32_t flags) {
+    updateNetworkLayout ();
+
+    cocos2d::ccDrawSolidRect (Vec2 (270, 420), Vec2 (270 + player->currentReloading / player->reloadTime * (360-270), 435), Color4F (1, 1, 0, 1));
 }
 
 void Program::initLayers () {
@@ -226,7 +237,11 @@ void Program::initMsgLabels () {
     gameLayer->addChild (lblDefeats, 10);
 }
 
-void Program::generateScene () {
+void Program::initNetworkLayout () {
+    networkLayout.init ();
+}
+
+void Program::generateScene (bool isMulti) {
     for (auto & e : vecEnemies) {
         if (e && e->getParent ())
             e->removeFromParent ();
@@ -234,13 +249,17 @@ void Program::generateScene () {
 
     vecEnemies.clear ();
 
-    for (unsigned int i = 0; i < maxEnemies; ++i) {
+    unsigned tempMax = maxEnemies;
+    if (isMulti)
+        tempMax = rand () % 10 + 1;
+
+    for (unsigned int i = 0; i < tempMax; ++i) {
         Enemy * enemy = Enemy::create ();
         enemy->setPosition (rand () % maxDistance + 150, gameLayer->getBoundingBox ().size.height / 2.f);
         gameLayer->addChild (enemy, 10);
         vecEnemies.push_back (enemy);
     }
-    enemies = maxEnemies;
+    enemies = tempMax;
     targetIndex = 0;
 
     minHp == 100 ? hp = 100 : hp = minHp + (rand () % (100 - minHp) + 1);
@@ -256,6 +275,10 @@ void Program::generateScene () {
     }
 
     status = 0;
+}
+
+void Program::updateNetworkLayout () {
+    networkLayout.draw ();
 }
 
 void Program::keyPressedEvent (cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event) {
@@ -291,13 +314,13 @@ void Program::keyPressedEvent (cocos2d::EventKeyboard::KeyCode keyCode, cocos2d:
 
             // SPAWN / SHUFFLE
         case Key::KEY_S:
-            generateScene ();
+            generateScene (false);
             break;
 
             // ANIMATED SIMULATION (ONE)
         case Key::KEY_SPACE:
-            if (status != 0) {
-                generateScene ();
+            if (status != 0 || vecEnemies.size() == 0) {
+                generateScene (false);
                 status = 0;
             }
             activeSimulationOne = true;
@@ -323,8 +346,8 @@ void Program::updateParam (bool increase) {
         case 0:
             if (increase) {
                 iterations *= 10;
-                if (iterations > 1000)
-                    iterations = 1000;
+                if (iterations > 10000)
+                    iterations = 10000;
             }
             else {
                 iterations /= 10;
@@ -402,6 +425,8 @@ void Program::updateLabelColors () {
 }
 
 void Program::simulateOne (float dt)  {
+    network.shouldIStayOrShouldIGo (hp, enemies, distance);
+
     // Reset Win/Loses
     victories = defeats = 0;
     lblDefeats->setString (std::to_string (defeats));
@@ -450,10 +475,14 @@ void Program::simulateOne (float dt)  {
     if (enemies == 0 && hp > 0)
         status = 1;
 
-    if (status == 1)
+    if (status == 1) {
+        network.learn (true);
         ++victories;
-    else if (status == -1)
+    }
+    else if (status == -1) {
+        network.learn (false);
         ++defeats;
+    }
 
     lblDefeats->setString (std::to_string (defeats));
     lblVictories->setString (std::to_string (victories));
@@ -465,7 +494,9 @@ void Program::simulateMany () {
     lblVictories->setString (std::to_string (victories));
 
     for (unsigned int i = 0; i < iterations; ++i) {
-        generateScene ();        
+        generateScene (true);        
+
+        bool prediction = network.shouldIStayOrShouldIGo (hp, enemies, distance);
 
         while (status == 0) {
             player->currentReloading += step;
@@ -512,10 +543,14 @@ void Program::simulateMany () {
         }
 
         // Results
-        if (status == 1)
+        if (status == 1) {
             ++victories;
-        else if (status == -1)
+            network.learn (true);
+        }
+        else if (status == -1) {
             ++defeats;
+            network.learn (false);
+        }
 
         lblDefeats->setString (std::to_string (defeats));
         lblVictories->setString (std::to_string (victories));

@@ -31,14 +31,14 @@ bool Network::shouldIStayOrShouldIGo (int hp, int enemies, int distance) {
 		return false;
 }
 
-void Network::learn (bool wasItAGoodDecision) {
+void Network::learn (bool attackOrNotToAttack) {
 	
 
 	// PART 1 - INSTRUCTOR AND ERROR PROPAGATION
-	if (wasItAGoodDecision)
+	if (attackOrNotToAttack)
 		layers [layers.size () - 1]->outputLayerError (1.0f);
 	else
-		layers [layers.size () - 1]->outputLayerError (0.0f);
+		layers [layers.size () - 1]->outputLayerError (-1.0f);
 
 	for (unsigned int i = layers.size () - 2; i >= 1; --i) {
 		layers [i]->calculateErrors (*layers [i + 1]);

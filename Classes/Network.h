@@ -3,8 +3,8 @@
 #ifndef NETWORK
 #define NETWORK
 
-#include"Layer.h"
-#include<vector>
+#include "Layer.h"
+#include <vector>
 
 
 class Network {
@@ -13,10 +13,10 @@ public:
 	~Network ();
 
 	bool shouldIStayOrShouldIGo (int hp, int enemies, int distance);
-	void learn (bool wasItAGoodDecision);
+	void learn (bool attackOrNotToAttack);
 
 private:
-	std::vector < Layer* > layers;
+	std::vector <Layer* > layers;
 
 };
 

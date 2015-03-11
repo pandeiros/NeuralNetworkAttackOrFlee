@@ -7,6 +7,8 @@
 #include "cocos2d.h"
 #include "Player.h"
 #include "Enemy.h"
+#include "NetworkLayout.h"
+#include "Network.h"
 #include <vector>
 
 class Program : public cocos2d::Scene
@@ -23,7 +25,12 @@ public:
 
     void update (float dt);
 
+    virtual void draw (cocos2d::Renderer *renderer, const cocos2d::Mat4& transform, uint32_t flags) override;
+
 private:
+    /// Network ITSELF
+    Network network;
+
     /// Init methods.
     void initLayers ();
     void initPlayer ();
@@ -31,10 +38,15 @@ private:
     void initParamLabels ();
     void initInfoLabels ();
     void initMsgLabels ();
+    void initNetworkLayout ();
+
+    /// Network layout
+    NetworkLayout networkLayout;
+    void updateNetworkLayout ();
 
     /// Events
     void keyPressedEvent (cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event);
-    void generateScene ();
+    void generateScene (bool isMulti);
     void updateParam (bool increase);
     void updateLabelColors ();
 
@@ -89,8 +101,6 @@ private:
 
     /// Changing parameters control
     int activeParam = 0;
-
-    /// Control labels
 
     /// Message labels
     cocos2d::Label * lblVictories;
