@@ -21,7 +21,13 @@
     <ClCompile Include="..\Classes\Program.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\Classes\Player.h">
+    <ClCompile Include="..\Classes\Layer.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Neuron.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Network.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
@@ -36,6 +42,16 @@
       <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="..\Classes\Enemy.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Player.h" />
+    <ClInclude Include="..\Classes\Layer.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Neuron.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Network.h">
       <Filter>src</Filter>
     </ClInclude>
   </ItemGroup>
