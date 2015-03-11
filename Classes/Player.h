@@ -22,8 +22,8 @@ public:
         }
     }
 
-private:
-
+    float reloadTime = 1.f;
+    float currentReloading = 0.f;
 };
 
 #endif // __PLAYER_H__

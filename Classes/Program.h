@@ -38,9 +38,12 @@ private:
     void updateLabelColors ();
 
     /// Simulation
-    void simulateOne ();
+    void simulateOne (float dt);
     void simulateMany ();
     void predict ();
+    bool activeSimulationOne = false;
+    unsigned int targetIndex = 0;
+    int status = 0; // 0 - unresolved, 1 - victory, -1 - defeat.
 
     /// Layers
     cocos2d::LayerColor * gameLayer;

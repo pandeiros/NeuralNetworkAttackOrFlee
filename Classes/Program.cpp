@@ -48,6 +48,14 @@ bool Program::init()
 }
 
 void Program::update (float dt) {
+    if (activeSimulationOne && status == 0 && vecEnemies.size() > 0)
+        simulateOne (dt);
+    else {
+        // Update messages.
+
+        activeSimulationOne = false; 
+    }
+
     // Update labels
     lblIterations->setString (std::to_string (iterations));
     lblMaxDistance->setString (std::to_string (maxDistance));
@@ -205,8 +213,10 @@ void Program::initInfoLabels () {
 
 void Program::generateScene () {
     for (auto & e : vecEnemies) {
-        e->removeFromParent ();
+        if (e && e->getParent())
+            e->removeFromParent ();
     }
+
     vecEnemies.clear ();
 
     for (unsigned int i = 0; i < maxEnemies; ++i) {
@@ -216,6 +226,7 @@ void Program::generateScene () {
         vecEnemies.push_back (enemy);
     }
     enemies = maxEnemies;
+    targetIndex = 0;
 
     minHp == 100 ? hp = 100 : hp = minHp + (rand () % (100 - minHp) + 1);
 
@@ -268,7 +279,11 @@ void Program::keyPressedEvent (cocos2d::EventKeyboard::KeyCode keyCode, cocos2d:
 
         // ANIMATED SIMULATION (ONE)
         case Key::KEY_SPACE :
-            simulateOne ();
+            if (status != 0) {
+                generateScene ();
+                status = 0;
+            }
+            activeSimulationOne = true;
             break;
 
         // MULTIPLE FAST SIMULATIONS
@@ -373,7 +388,49 @@ void Program::updateLabelColors () {
     }
 }
 
-void Program::simulateOne () {
+void Program::simulateOne (float dt) {
+    // Reload
+    player->currentReloading += dt;
+
+    // Shoot
+    if (player->currentReloading >= player->reloadTime) {
+        player->currentReloading -= player->reloadTime;
+
+        // Kill first enemy
+        vecEnemies[targetIndex]->removeFromParent ();
+        vecEnemies[targetIndex] = nullptr;
+        ++targetIndex;
+        --enemies;
+    }
+
+    // Move enemies
+    for (auto & e : vecEnemies) {
+        if (e) {
+            e->setPositionX (e->getPositionX () - e->speedPerSecond * dt);
+
+            // Attack player if in range
+            if (e->getPositionX () <= player->getPositionX () + player->getBoundingBox().size.width) {
+                unsigned int tempDMG = e->minDMG + rand () % (e->maxDMG - e->minDMG + 1);
+                tempDMG > hp ? hp = 0 : hp -= tempDMG;
+               
+                e->removeFromParent ();
+                e = nullptr;
+                ++targetIndex;
+                --enemies;
+
+                // Check player's hp
+                if (hp <= 0) {
+
+                    // DEFEAT
+                    status = -1;
+                }
+            }
+        }
+    }
+
+    // VICTORY
+    if (enemies == 0)
+        status = 1;
 }
 
 void Program::simulateMany () {

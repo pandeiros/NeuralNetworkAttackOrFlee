@@ -22,8 +22,9 @@ public:
         }
     }
 
-private:
-
+    float speedPerSecond = 200;
+    unsigned int maxDMG = 50;
+    unsigned int minDMG = 30;
 };
 
 #endif // __ENEMY_H__
